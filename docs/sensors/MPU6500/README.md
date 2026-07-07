@@ -10,7 +10,7 @@
 ## Grandeza medida
 
 Giroscópio - velocidade angular (graus/s)
-Acelerômetro - aceleração da gravidade (m/s^2)
+Acelerômetro - aceleração linear (m/s^2)
 
 ## Interface
 
@@ -88,6 +88,19 @@ Acelerômetro - aceleração da gravidade (m/s^2)
 
 ## Precisão
 
+### Giroscópio
+| Parâmetro | Valor |
+|---|---|
+| Offset (ZRO) | +-5 (graus/s) |
+| RMS Noise | 0.1 (graus/s-RMS) |
+| Noise Density | 0.01 (graus/s/sqrt(Hz)) |
+
+### Acelerômetro
+| Parâmetro | Valor |
+|---|---|
+| Offset | +- 60 (m g) |
+| Noise Density | 300 u g/sqrt(Hz) |
+
 ## Registradores importantes
 
 | Registrador | Descrição |
@@ -106,7 +119,7 @@ Acelerômetro - aceleração da gravidade (m/s^2)
 1. Identificar o chip: ler WHOAMI = 0x70 (default)
 2. Tirar do modo dormir: Limpar o bit SLEEP do POWER_MGMT_1
 3. Configurar a full scale range do giroscópio e acelerômetro
-4. Configurar filtro passa-baixa (frequencia de corte entre )
+4. Configurar filtro passa-baixa (frequencia de corte entre 5 e 250 Hz)
 5. Ler dados
 
 ## Fluxo de aquisição
@@ -140,5 +153,8 @@ Acelerômetro - aceleração da gravidade (m/s^2)
 ## Ideias de pesquisa
 
 ## Datasheet
+
+[MPU6500 Product Specification](./datasheet2.pdf)
+[Register Map](./register_map.pdf)
 
 ## Artigos interessantes
