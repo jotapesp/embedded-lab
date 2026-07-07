@@ -1,0 +1,1 @@
+void gpioc_init();
