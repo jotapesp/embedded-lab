@@ -9,13 +9,13 @@ void uart_init() {
     GPIOA->CRH |= (0x4 << 8); // PA10 RX - config para 0100 (CNF-MODE)
     USART1->BRR = 833 ; // BRR = f_clock / baud_rate -> 8Mhz (HSI) / 9600 = 833.33
     // não configuramos o tamanho da palavra, paridade e stop bits no CR1 pois usamos padrao 8N1
-    USART1->CR1 |= (1 << 4); // Transmitter Enable
+    USART1->CR1 |= (1 << 3); // Transmitter Enable
     USART1->CR1 |= (1 << 13); // USART Enable
 }
 
 void uart_send_byte(char c) {
 
-    while (!(USART1->SR & (1 << 7))) {};
+    while (!(USART1->SR & (1 << 7))) {}; // tem que esperar o TXE ir pra 1
     USART1->DR = c;
 
 }
