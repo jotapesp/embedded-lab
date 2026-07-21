@@ -126,7 +126,7 @@ Acelerômetro - aceleração linear (m/s^2)
 
 1. Requisitar leitura do registrador 59 (0x3B)
 2. Ler 6 bytes consecutivos (acelerômetro X, Y, Z)
-3. Requisitar leitura a partir do registrador 67
+3. Requisitar leitura a partir do registrador 67 (0x43)
 4. Ler 6 bytes consecutivos (giroscópio X, Y, Z)
 5. Combinar bytes alto e baixo de cada eixo
 6. Dividir pela sensibilidade → valor em unidade física

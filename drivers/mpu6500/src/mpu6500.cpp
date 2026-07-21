@@ -35,7 +35,7 @@ bool MPU6500::init(){
     return true;
 }
 
-AccelData MPU6500::read_accel(){
+MPU6500::AccelData MPU6500::read_accel(){
 
     AccelData read_data;
     read_data.x = _read_reg(_addr, 0x3B) << 8;
@@ -44,6 +44,19 @@ AccelData MPU6500::read_accel(){
     read_data.y |= _read_reg(_addr, 0x3B + 3);
     read_data.z = _read_reg(_addr, 0x3B + 4) << 8;
     read_data.z |= _read_reg(_addr, 0x3B + 5);
+
+    return read_data;
+}
+
+MPU6500::GyroData MPU6500::read_gyro(){
+
+    GyroData read_data;
+    read_data.x = _read_reg(_addr, 0x43) << 8;
+    read_data.x |= _read_reg(_addr, 0x43 + 1);
+    read_data.y = _read_reg(_addr, 0x43 + 2) << 8;
+    read_data.y |= _read_reg(_addr, 0x43 + 3);
+    read_data.z = _read_reg(_addr, 0x43 + 4) << 8;
+    read_data.z |= _read_reg(_addr, 0x43 + 5);
 
     return read_data;
 }

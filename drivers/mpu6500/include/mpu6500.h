@@ -19,6 +19,11 @@ class MPU6500 {
         int16_t x, y, z;
     };
 
+    struct GyroData {
+        int16_t x, y, z;
+    };
+
     bool init();
     AccelData read_accel();
+    GyroData read_gyro();
 };
