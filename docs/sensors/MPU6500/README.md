@@ -105,26 +105,26 @@ Acelerômetro - aceleração linear (m/s^2)
 
 | Registrador | Descrição |
 |---|---|
-| 107 | PWR_MGMT_1 (acordar o sensor) |
-| 26 | configuração do filtro passa-baixa (frequencia de corte configurável entre 5-260Hz) |
-| 27/28 | configuração do giroscópio/acelerômetro (full-scale range) |
-| 59-64 | dados do acelerômetro |
+| 107 (0x6B) | PWR_MGMT_1 (acordar o sensor) |
+| 26 (0x1A) | configuração do filtro passa-baixa (frequencia de corte configurável entre 5-260Hz) |
+| 27/28 (0x1B/0x1C) | configuração do giroscópio/acelerômetro (full-scale range) |
+| 59-64 (0x3B-0x40)| dados do acelerômetro |
 | 65-66 | temperatura |
-| 67-72 | dados do giroscópio |
+| 67-72 (0x43-0x48) | dados do giroscópio |
 | 106 | User Control |
 
 ## Fluxo de inicialização
 
-0. Endereço i2c
+0. Endereço i2c (no MPU-6500 0x68 ou 0x69 dependendo do valor no pino AD0)
 1. Identificar o chip: ler WHOAMI = 0x70 (default)
-2. Tirar do modo dormir: Limpar o bit SLEEP do POWER_MGMT_1
-3. Configurar a full scale range do giroscópio e acelerômetro
-4. Configurar filtro passa-baixa (frequencia de corte entre 5 e 250 Hz)
+2. Tirar do modo dormir: Limpar o bit SLEEP (6) do PWR_MGMT_1 (0x6B)
+3. Configurar a full scale range do giroscópio e acelerômetro (0x1B e 0x1C)
+4. Configurar filtro passa-baixa (frequência de corte entre 5 (6 (110) - máximo) e 250 Hz (0 (000) - desativado)): Reg 0x1A configurar os bits DLPF-CFG [2:0] 
 5. Ler dados
 
 ## Fluxo de aquisição
 
-1. Requisitar leitura do registrador 59
+1. Requisitar leitura do registrador 59 (0x3B)
 2. Ler 6 bytes consecutivos (acelerômetro X, Y, Z)
 3. Requisitar leitura a partir do registrador 67
 4. Ler 6 bytes consecutivos (giroscópio X, Y, Z)
