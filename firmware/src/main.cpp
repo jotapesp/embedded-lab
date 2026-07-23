@@ -9,6 +9,7 @@ int main() {
 
     led_init();
     uart_init();
+    i2c_init();
     MPU6500 mpu_sensor = MPU6500(0x68, i2c_write_register, i2c_read_register);
     bool mpu_check = mpu_sensor.init();
     if (!mpu_check){
