@@ -1,46 +1,53 @@
+# firmware/lib
 
-This directory is intended for project specific (private) libraries.
-PlatformIO will compile them to static libraries and link into the executable file.
+Bibliotecas internas do firmware, compiladas pelo PlatformIO como bibliotecas estáticas e linkadas ao executável. Cada subpasta é um módulo independente (`lib/<nome>/<nome>.h` + `<nome>.cpp`), sem sistema de build próprio — o PlatformIO Library Dependency Finder resolve as dependências automaticamente ao escanear os `#include` usados em `src/`.
 
-The source code of each library should be placed in a separate directory
-("lib/your_library_name/[Code]").
+Diferente de `drivers/` (sensores externos, reutilizáveis entre projetos), o conteúdo de `lib/` é específico da placa alvo (Bluepill / STM32F103C8, acesso direto a registrador via CMSIS) e não pretende ser portável.
 
-For example, see the structure of the following example libraries `Foo` and `Bar`:
+## Módulos
 
-|--lib
-|  |
-|  |--Bar
-|  |  |--docs
-|  |  |--examples
-|  |  |--src
-|  |     |- Bar.c
-|  |     |- Bar.h
-|  |  |- library.json (optional. for custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
-|  |
-|  |--Foo
-|  |  |- Foo.c
-|  |  |- Foo.h
-|  |
-|  |- README --> THIS FILE
-|
-|- platformio.ini
-|--src
-   |- main.c
+### `gpioc`
 
-Example contents of `src/main.c` using Foo and Bar:
-```
-#include <Foo.h>
-#include <Bar.h>
+Habilita o clock do periférico GPIOC (`RCC->APB2ENR`, bit 4). Pré-requisito de qualquer módulo que use pinos da porta C — hoje, apenas `led`.
 
-int main (void)
-{
-  ...
-}
+- `gpioc_init()`
 
-```
+### `led`
 
-The PlatformIO Library Dependency Finder will find automatically dependent
-libraries by scanning project source files.
+Controla o LED onboard da Bluepill, ligado a PC13 (ativo em nível lógico, push-pull, saída 2 MHz). Depende de `gpioc` para habilitar o clock da porta antes de configurar o pino.
 
-More information about PlatformIO Library Dependency Finder
-- https://docs.platformio.org/page/librarymanager/ldf.html
+- `led_init()` — configura PC13 como saída e chama `gpioc_init()`
+- `led_on()` / `led_off()` — seta/limpa o pino diretamente via `ODR`
+- `led_toggle()` — inverte o estado do pino via XOR no `ODR`
+
+### `uart`
+
+Comunicação serial via USART1 (PA9 = TX, PA10 = RX), usada como canal de debug e, futuramente, para o protocolo STM32 → Python. Configuração fixa: 8N1, baud rate 9600, clock HSI (8 MHz) sem PLL — por isso `BRR = 833` (8 MHz / 9600).
+
+- `uart_init()` — habilita clocks, configura PA9/PA10 e ativa transmissor
+- `uart_send_byte(char c)` — envia um byte, aguardando a flag `TXE`
+- `uart_send_string(const char* str)` — envia uma string terminada em `\0`, byte a byte
+
+Somente transmissão está implementada; recepção (RX) ainda não foi habilitada no `CR1`.
+
+### `i2c`
+
+Driver bare-metal do periférico I2C1 (PB6 = SCL, PB7 = SDA, ambos open-drain), usado para comunicação com sensores no barramento I2C (ex.: MPU6500). Modo padrão (Standard Mode, 100 kHz), clock HSI de 8 MHz.
+
+- `i2c_init()` — habilita clocks de I2C1 e GPIOB, configura PB6/PB7 como open-drain, seta `CCR`/`TRISE` para 100 kHz e habilita o periférico (`PE`)
+- `i2c_write_register(uint8_t addr, uint8_t reg, uint8_t data)` — escreve um byte em um registrador do dispositivo `addr` (transação START → endereço+W → registrador → dado → STOP)
+- `i2c_read_register(uint8_t addr, uint8_t reg)` — lê um byte de um registrador (transação START → endereço+W → registrador → RESTART → endereço+R → dado, com NACK antes do STOP)
+
+As assinaturas de `i2c_write_register`/`i2c_read_register` casam com os typedefs `I2C_write_register`/`I2C_read_register` esperados pelos drivers em `drivers/` (ex.: `MPU6500`), permitindo injetar essas funções no construtor do driver sem acoplar o driver ao periférico STM32 diretamente.
+
+### `utils`
+
+Utilitários genéricos sem dependência de periférico específico.
+
+- `delay(volatile uint32_t count)` — delay bloqueante por contagem de ciclos (`__NOP()` em loop); não calibrado para uma unidade de tempo real, apenas para espera aproximada (ex.: piscar o LED).
+
+## Convenções
+
+- Um módulo por sensor/periférico, com API em C (funções livres), não em classes — exceto quando o módulo expõe estado por instância (caso dos drivers em `drivers/`, que são C++).
+- Nomes de função prefixados pelo nome do módulo (`i2c_*`, `led_*`, `uart_*`).
+- Comentários no código explicam o *porquê* de cada configuração de registrador (bits específicos), já que a leitura de datasheet/reference manual é parte do processo de aprendizado deste projeto — ver `docs/stm32/`.
