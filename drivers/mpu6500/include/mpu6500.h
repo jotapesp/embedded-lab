@@ -1,6 +1,7 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
+
 
 typedef void (*I2C_write_register)(uint8_t addr, uint8_t reg, uint8_t data);
 typedef uint8_t (*I2C_read_register)(uint8_t addr, uint8_t reg);
@@ -14,6 +15,7 @@ class MPU6500 {
 
     public:
     MPU6500(uint8_t addr, I2C_write_register write_func, I2C_read_register read_func);
+    uint8_t _last_read_val; // usado para debug principalmente
 
     struct AccelData {
         int16_t x, y, z;

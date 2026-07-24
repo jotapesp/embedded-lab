@@ -10,6 +10,7 @@ bool MPU6500::init(){
     uint8_t val, curr_val, write_data;
     // checar se o WHOAMI (0x75) contém o valor default (0x70)
     val = _read_reg(_addr, 0x75);
+    _last_read_val = val;
     if (val != 0x70){
         return false;
     }

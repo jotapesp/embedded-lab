@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 
 void i2c_init();
 void i2c_write_register(uint8_t addr, uint8_t reg, uint8_t data);

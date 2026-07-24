@@ -28,3 +28,22 @@ void uart_send_string(const char* str){
         ptr += 1;
     }
 }
+
+void uart_send_hex(uint8_t val) {
+    const char char_index[] = "0123456789ABCDEF";
+
+    char str[7];
+    *str = '0';
+    *(str + 1) = 'x';
+    // digito hex mais significativo sao os 4 bits bin mais significativos
+    // divide por 16 para descartar ultimo digito hex, sobra o mais signficativo
+    *(str + 2) = char_index[(val >> 4) & (0x0F)];
+    // digito hex menos significativo sao os 4 bits bin menos significativos
+    // zera os 4 bits mais altos e sobra os 4 mais baixos, ou seja, o ultimo digito hex
+    *(str + 3) = char_index[val & 0x0F];
+    *(str + 4) = '\r';
+    *(str + 5) = '\n';
+    *(str + 6) = '\0';
+
+    uart_send_string(str);
+}
