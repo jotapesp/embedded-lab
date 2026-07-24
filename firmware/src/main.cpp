@@ -22,6 +22,11 @@ int main() {
 
     MPU6500 mpu_sensor = MPU6500(0x68, i2c_write_register, i2c_read_register);
     bool mpu_check = mpu_sensor.init();
+    uart_send_string("SR1: \n");
+    uart_send_string("HIGH: ");
+    uart_send_hex((uint8_t)(I2C1->SR1 & 0xFF));
+    uart_send_string("LOW: ");
+    uart_send_hex((uint8_t)((I2C1->SR1 >> 8) & 0xFF));
     uart_send_hex(mpu_sensor._last_read_val);
     if (!mpu_check){
         uart_send_string("MPU6500 não encontrado\r\n");
